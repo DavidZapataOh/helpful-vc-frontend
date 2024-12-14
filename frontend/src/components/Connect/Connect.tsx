@@ -20,14 +20,13 @@ export const Connect: React.FC<{
     setConnected(accounts.length > 0);
   };
 
-  
   const hasValidNetwork = async (): Promise<boolean> => {
     const currentChainId: string = (
       await window.ethereum.request({
         method: 'eth_chainId',
       })
     ).toLowerCase();
-    
+
     return import.meta.env.MOCKED
       ? currentChainId === AUTHORIZED_CHAIN_ID[2]
       : currentChainId === AUTHORIZED_CHAIN_ID[0];
@@ -115,7 +114,7 @@ export const Connect: React.FC<{
           <p className="text-textSecondary">
             You are not on the correct network
           </p>
-          <button 
+          <button
             onClick={switchNetwork}
             className="bg-primary hover:bg-primaryHover text-secondary transition-colors duration-200"
           >
@@ -126,28 +125,20 @@ export const Connect: React.FC<{
     }
 
     if (loading) {
-      return (
-        <p className="text-center text-textSecondary">
-          Loading...
-        </p>
-      );
+      return <p className="text-center text-textSecondary">Loading...</p>;
     }
 
     return children(account, provider);
   }, [account, provider, children, validNetwork, loading]);
 
   if (error) {
-    return (
-      <p className="text-center text-textSecondary">
-        No wallet found.
-      </p>
-    );
+    return <p className="text-center text-textSecondary">No wallet found.</p>;
   }
 
   const connectInfos = (
     <div className="flex justify-center items-center space-x-4 mb-6">
       {!connected && (
-        <button 
+        <button
           onClick={connect}
           className="bg-primary hover:bg-primaryHover text-secondary px-6 py-2 rounded-lg transition-colors duration-200"
         >
@@ -168,9 +159,7 @@ export const Connect: React.FC<{
   return (
     <div className="w-full space-y-6">
       {connectInfos}
-      <div className="w-full">
-        {child}
-      </div>
+      <div className="w-full">{child}</div>
     </div>
   );
 };
