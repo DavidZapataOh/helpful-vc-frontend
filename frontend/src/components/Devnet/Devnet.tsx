@@ -16,6 +16,7 @@ export type DevnetProps = {
 export const Devnet = ({ account, provider }: DevnetProps) => {
   const [contractAddress, setContractAddress] = useState(ZeroAddress);
   const [handleBalance, setHandleBalance] = useState('0');
+
   const [decryptedBalance, setDecryptedBalance] = useState('???');
   const [handles, setHandles] = useState<Uint8Array[]>([]);
   const [encryption, setEncryption] = useState<Uint8Array>();
@@ -25,6 +26,7 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
   const [chosenAddress, setChosenAddress] = useState('0x');
   const [errorMessage, setErrorMessage] = useState('');
   const [decryptedSecret, setDecryptedResult] = useState('???');
+  const [publicBalance, setPublicBalance] = useState('???');
 
   useEffect(() => {
     const loadData = async () => {
@@ -91,9 +93,22 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
     }
   };
 
-  useEffect(() => {
-    getHandleBalance();
-  }, [account, provider, contractAddress]);
+  const getHandlePublicBalance = async () => {
+    if (contractAddress !== ZeroAddress) {
+      console.log();
+      console.log('Getting public balance...');
+      const contract = new ethers.Contract(
+        contractAddress,
+        ['function exposedBalance(address) view returns (uint256)'],
+        provider,
+      );
+
+      const balance = await contract.exposedBalance(account);
+      console.log('Public balance:', balance.toString());
+      console.log('Public balance:', balance.toString());
+      setPublicBalance(balance.toString());
+    }
+  };
 
   const encrypt = async (val: bigint) => {
     const now = Date.now();
@@ -113,7 +128,6 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
 
   const decrypt = async () => {
     const signer = await provider.getSigner();
-    console.log(signer);
     try {
       const clearBalance = await reencryptEuint64(
         signer,
@@ -164,7 +178,7 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
   const refreshSecret = async () => {
     const contract = new ethers.Contract(
       contractAddress,
-      ['function exposedBalance() view returns(uint64)'],
+      ['function exposedBalance() view returns(uint256)'],
       provider,
     );
     const revealedSecret = await contract.exposedBalance();
@@ -173,6 +187,11 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
     setDecryptedResult(revealedSecretString);
   };
 
+  useEffect(() => {
+    getHandleBalance();
+    getHandlePublicBalance();
+  }, [account, provider, contractAddress]);
+
   return (
     <div className="bg-elementBackground rounded-lg p-6 max-w-2xl mx-auto">
       <dl className="space-y-6">
@@ -180,20 +199,24 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
           <dt className="text-lg font-semibold text-secondary mb-2">
             My encrypted balance is:
           </dt>
-          <dd className="text-textSecondary">{handleBalance.toString()}</dd>
-
-          <button 
+          <dd className="text-textSecondary truncate max-w-xs">
+            {handleBalance.toString()}
+          </dd>
+          <button
             onClick={() => decrypt()}
-            className="mt-2"
+            className="mt-2 bg-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
           >
             Reencrypt and decrypt my balance
           </button>
           <dd className="mt-2 text-textSecondary">
-            My decrypted private balance is: {decryptedBalance.toString()}
+            My decrypted current balance is: {decryptedBalance.toString()}
+          </dd>
+          <dd className="mt-2 text-textSecondary">
+            My public balance is: {publicBalance}
           </dd>
         </div>
 
-        <div>
+        {/* <div>
           <dt className="text-lg font-semibold text-secondary mb-2">
             Choose an amount to transfer:
           </dt>
@@ -212,15 +235,12 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
               You have chosen: {chosenValue}
             </p>
           )}
-          <button 
-            onClick={() => encrypt(BigInt(chosenValue))}
-            className="mt-2"
-          >
+          <button onClick={() => encrypt(BigInt(chosenValue))} className="mt-2">
             Encrypt {chosenValue}
           </button>
-        </div>
+        </div> */}
 
-        {handles.length > 0 && (
+        {/* {handles.length > 0 && (
           <div>
             <dt className="text-lg font-semibold text-secondary mb-2">
               This is an encryption of {chosenValue}:
@@ -234,9 +254,9 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
               </pre>
             </dd>
           </div>
-        )}
+        )} */}
 
-        <div>
+        {/* <div>
           <div className="flex gap-2 items-center">
             <input
               type="text"
@@ -252,27 +272,23 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
               Chosen recipient address: {chosenAddress}
             </p>
           )}
-          {errorMessage && (
-            <p className="mt-2 text-red-500">
-              {errorMessage}
-            </p>
-          )}
-        </div>
+          {errorMessage && <p className="mt-2 text-red-500">{errorMessage}</p>}
+        </div> */}
 
-        {chosenAddress !== '0x' && encryption && encryption.length > 0 && (
+        {/* {chosenAddress !== '0x' && encryption && encryption.length > 0 && (
           <div>
-            <button 
+            <button
               onClick={transferToken}
               className="w-full bg-primary hover:bg-primaryHover"
             >
               Transfer Encrypted Amount to Recipient
             </button>
           </div>
-        )}
+        )} */}
 
-        <div className="space-y-2">
-          <button 
-            onClick={decryptSecret} 
+        {/* <div className="space-y-2">
+          <button
+            onClick={decryptSecret}
             disabled={decryptedSecret !== '???'}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -288,7 +304,7 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
               Refresh Decrypted Secret
             </button>
           </dd>
-        </div>
+        </div> */}
       </dl>
     </div>
   );
