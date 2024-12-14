@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getInstance } from '../../fhevmjs';
-import './Devnet.css';
 import { Eip1193Provider, ZeroAddress } from 'ethers';
 import { ethers } from 'ethers';
-
 import { reencryptEuint64 } from '../../../../hardhat/test/reencrypt.ts';
 
 const toHexString = (bytes: Uint8Array) =>
@@ -17,20 +15,15 @@ export type DevnetProps = {
 
 export const Devnet = ({ account, provider }: DevnetProps) => {
   const [contractAddress, setContractAddress] = useState(ZeroAddress);
-
   const [handleBalance, setHandleBalance] = useState('0');
   const [decryptedBalance, setDecryptedBalance] = useState('???');
-
   const [handles, setHandles] = useState<Uint8Array[]>([]);
   const [encryption, setEncryption] = useState<Uint8Array>();
-
-  const [inputValue, setInputValue] = useState(''); // Track the input
-  const [chosenValue, setChosenValue] = useState('0'); // Track the confirmed value
-
+  const [inputValue, setInputValue] = useState('');
+  const [chosenValue, setChosenValue] = useState('0');
   const [inputValueAddress, setInputValueAddress] = useState('');
   const [chosenAddress, setChosenAddress] = useState('0x');
   const [errorMessage, setErrorMessage] = useState('');
-
   const [decryptedSecret, setDecryptedResult] = useState('???');
 
   useEffect(() => {
@@ -180,89 +173,116 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
   };
 
   return (
-    <div>
-      <dl>
-        <dt className="Devnet__title">My encrypted balance is:</dt>
-        <dd className="Devnet__dd">{handleBalance.toString()}</dd>
-
-        <button onClick={() => decrypt()}>
-          Reencrypt and decrypt my balance
-        </button>
-        <dd className="Devnet__dd">
-          My decrypted private balance is: {decryptedBalance.toString()}
-        </dd>
-
-        <dd className="Devnet__dd">Chose an amount to transfer:</dd>
-
+    <div className="bg-elementBackground rounded-lg p-6 max-w-2xl mx-auto">
+      <dl className="space-y-6">
         <div>
-          <input
-            type="number"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Enter a number"
-          />{' '}
-          <button onClick={handleConfirmAmount}>OK</button>
-          {chosenValue !== null && (
-            <div>
-              <p>You chose: {chosenValue}</p>
-            </div>
-          )}
-        </div>
+          <dt className="text-lg font-semibold text-secondary mb-2">
+            My encrypted balance is:
+          </dt>
+          <dd className="text-textSecondary">{handleBalance.toString()}</dd>
 
-        <button onClick={() => encrypt(BigInt(chosenValue))}>
-          Encrypt {chosenValue}
-        </button>
-        <dt className="Devnet__title">
-          This is an encryption of {chosenValue}:
-        </dt>
-        <dd className="Devnet__dd">
-          <pre className="Devnet__pre">
-            Handle: {handles.length ? toHexString(handles[0]) : ''}
-          </pre>
-          <pre className="Devnet__pre">
-            Input Proof: {encryption ? toHexString(encryption) : ''}
-          </pre>
-        </dd>
-
-        <div>
-          <input
-            type="text"
-            value={inputValueAddress}
-            onChange={(e) => setInputValueAddress(e.target.value)}
-            placeholder="Receiver address"
-          />
-          <button onClick={handleConfirmAddress}>OK</button>{' '}
-          {chosenAddress && (
-            <div>
-              <p>Chosen Address For Receiver: {chosenAddress}</p>
-            </div>
-          )}
-          {errorMessage && (
-            <div style={{ color: 'red' }}>
-              <p>{errorMessage}</p>
-            </div>
-          )}
+          <button 
+            onClick={() => decrypt()}
+            className="mt-2"
+          >
+            Reencrypt and decrypt my balance
+          </button>
+          <dd className="mt-2 text-textSecondary">
+            My decrypted private balance is: {decryptedBalance.toString()}
+          </dd>
         </div>
 
         <div>
-          {chosenAddress !== '0x' && encryption && encryption.length > 0 && (
-            <button onClick={transferToken}>
-              Transfer Encrypted Amount To Receiver
-            </button>
+          <dt className="text-lg font-semibold text-secondary mb-2">
+            Choose an amount to transfer:
+          </dt>
+          <div className="flex gap-2 items-center">
+            <input
+              type="number"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Enter a number"
+              className="bg-background text-secondary px-3 py-2 rounded-lg border border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <button onClick={handleConfirmAmount}>OK</button>
+          </div>
+          {chosenValue !== '0' && (
+            <p className="mt-2 text-textSecondary">
+              You have chosen: {chosenValue}
+            </p>
           )}
-        </div>
-
-        <div>
-          <button onClick={decryptSecret} disabled={decryptedSecret !== '???'}>
-            Request Secret Decryption
+          <button 
+            onClick={() => encrypt(BigInt(chosenValue))}
+            className="mt-2"
+          >
+            Encrypt {chosenValue}
           </button>
         </div>
+
+        {handles.length > 0 && (
+          <div>
+            <dt className="text-lg font-semibold text-secondary mb-2">
+              This is an encryption of {chosenValue}:
+            </dt>
+            <dd className="space-y-2">
+              <pre className="bg-background p-3 rounded-lg overflow-x-auto text-textSecondary text-sm">
+                Handle: {handles.length ? toHexString(handles[0]) : ''}
+              </pre>
+              <pre className="bg-background p-3 rounded-lg overflow-x-auto text-textSecondary text-sm">
+                Input Proof: {encryption ? toHexString(encryption) : ''}
+              </pre>
+            </dd>
+          </div>
+        )}
+
         <div>
-          <dd className="Devnet__dd">
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={inputValueAddress}
+              onChange={(e) => setInputValueAddress(e.target.value)}
+              placeholder="Recipient address"
+              className="flex-1 bg-background text-secondary px-3 py-2 rounded-lg border border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <button onClick={handleConfirmAddress}>OK</button>
+          </div>
+          {chosenAddress !== '0x' && (
+            <p className="mt-2 text-textSecondary">
+              Chosen recipient address: {chosenAddress}
+            </p>
+          )}
+          {errorMessage && (
+            <p className="mt-2 text-red-500">
+              {errorMessage}
+            </p>
+          )}
+        </div>
+
+        {chosenAddress !== '0x' && encryption && encryption.length > 0 && (
+          <div>
+            <button 
+              onClick={transferToken}
+              className="w-full bg-primary hover:bg-primaryHover"
+            >
+              Transfer Encrypted Amount to Recipient
+            </button>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <button 
+            onClick={decryptSecret} 
+            disabled={decryptedSecret !== '???'}
+            className="disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Request Secret Decryption
+          </button>
+          <dd className="text-textSecondary">
             The decrypted secret value is: {decryptedSecret}{' '}
             <button
               onClick={refreshSecret}
               disabled={decryptedSecret !== '???'}
+              className="ml-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Refresh Decrypted Secret
             </button>

@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { BrowserProvider } from 'ethers';
-
-import './Connect.css';
 import { Eip1193Provider } from 'ethers';
 import { createFhevmInstance } from '../../fhevmjs';
 
@@ -22,13 +20,14 @@ export const Connect: React.FC<{
     setConnected(accounts.length > 0);
   };
 
+  
   const hasValidNetwork = async (): Promise<boolean> => {
     const currentChainId: string = (
       await window.ethereum.request({
         method: 'eth_chainId',
       })
     ).toLowerCase();
-
+    
     return import.meta.env.MOCKED
       ? currentChainId === AUTHORIZED_CHAIN_ID[2]
       : currentChainId === AUTHORIZED_CHAIN_ID[0];
@@ -112,41 +111,66 @@ export const Connect: React.FC<{
 
     if (!validNetwork) {
       return (
-        <div>
-          <p>You're not on the correct network</p>
-          <p>
-            <button onClick={switchNetwork}>
-              Switch to {import.meta.env.MOCKED ? 'Hardhat' : 'Sepolia'}
-            </button>
+        <div className="text-center space-y-4">
+          <p className="text-textSecondary">
+            You are not on the correct network
           </p>
+          <button 
+            onClick={switchNetwork}
+            className="bg-primary hover:bg-primaryHover text-secondary transition-colors duration-200"
+          >
+            Switch to {import.meta.env.VITE_MOCKED ? 'Hardhat' : 'Sepolia'}
+          </button>
         </div>
       );
     }
 
     if (loading) {
-      return <p>Loading...</p>;
+      return (
+        <p className="text-center text-textSecondary">
+          Loading...
+        </p>
+      );
     }
 
     return children(account, provider);
   }, [account, provider, children, validNetwork, loading]);
 
   if (error) {
-    return <p>No wallet has been found.</p>;
+    return (
+      <p className="text-center text-textSecondary">
+        No wallet found.
+      </p>
+    );
   }
 
   const connectInfos = (
-    <div className="Connect__info">
-      {!connected && <button onClick={connect}>Connect your wallet</button>}
+    <div className="flex justify-center items-center space-x-4 mb-6">
+      {!connected && (
+        <button 
+          onClick={connect}
+          className="bg-primary hover:bg-primaryHover text-secondary px-6 py-2 rounded-lg transition-colors duration-200"
+        >
+          Connect wallet
+        </button>
+      )}
       {connected && (
-        <div className="Connect__account">Connected with {account}</div>
+        <div className="text-textSecondary">
+          Connected with{' '}
+          <span className="text-primary font-medium">
+            {account.slice(0, 6)}...{account.slice(-4)}
+          </span>
+        </div>
       )}
     </div>
   );
 
   return (
-    <>
+    <div className="w-full space-y-6">
       {connectInfos}
-      <div className="Connect__child">{child}</div>
-    </>
+      <div className="w-full">
+        {child}
+      </div>
+    </div>
   );
 };
