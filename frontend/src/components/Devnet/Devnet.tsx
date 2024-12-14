@@ -167,25 +167,26 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
   const decryptSecret = async () => {
     const contract = new ethers.Contract(
       contractAddress,
-      ['function requestExposeBalance(address) external'],
+      ['function requestExposeBalance() external'],
       provider,
     );
     const signer = await provider.getSigner();
-    const tx = await contract.connect(signer).requestExposeBalance(account);
+    const tx = await contract.connect(signer).requestExposeBalance();
     await tx.wait();
+    await getHandlePublicBalance();
   };
 
-  const refreshSecret = async () => {
-    const contract = new ethers.Contract(
-      contractAddress,
-      ['function exposedBalance() view returns(uint256)'],
-      provider,
-    );
-    const revealedSecret = await contract.exposedBalance();
-    const revealedSecretString =
-      revealedSecret === 0n ? '???' : revealedSecret.toString();
-    setDecryptedResult(revealedSecretString);
-  };
+  // const refreshSecret = async () => {
+  //   const contract = new ethers.Contract(
+  //     contractAddress,
+  //     ['function exposedBalance() view returns(uint256)'],
+  //     provider,
+  //   );
+  //   const revealedSecret = await contract.exposedBalance();
+  //   const revealedSecretString =
+  //     revealedSecret === 0n ? '???' : revealedSecret.toString();
+  //   setDecryptedResult(revealedSecretString);
+  // };
 
   useEffect(() => {
     getHandleBalance();
@@ -286,15 +287,15 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
           </div>
         )} */}
 
-        {/* <div className="space-y-2">
+        <div className="space-y-2">
           <button
             onClick={decryptSecret}
             disabled={decryptedSecret !== '???'}
-            className="disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primaryHover disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Request Secret Decryption
           </button>
-          <dd className="text-textSecondary">
+          {/* <dd className="text-textSecondary">
             The decrypted secret value is: {decryptedSecret}{' '}
             <button
               onClick={refreshSecret}
@@ -303,8 +304,8 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
             >
               Refresh Decrypted Secret
             </button>
-          </dd>
-        </div> */}
+          </dd> */}
+        </div>
       </dl>
     </div>
   );
