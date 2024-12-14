@@ -113,6 +113,7 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
 
   const decrypt = async () => {
     const signer = await provider.getSigner();
+    console.log(signer);
     try {
       const clearBalance = await reencryptEuint64(
         signer,
@@ -152,21 +153,21 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
   const decryptSecret = async () => {
     const contract = new ethers.Contract(
       contractAddress,
-      ['function requestSecret() external'],
+      ['function requestExposeBalance(address) external'],
       provider,
     );
     const signer = await provider.getSigner();
-    const tx = await contract.connect(signer).requestSecret();
+    const tx = await contract.connect(signer).requestExposeBalance(account);
     await tx.wait();
   };
 
   const refreshSecret = async () => {
     const contract = new ethers.Contract(
       contractAddress,
-      ['function revealedSecret() view returns(uint64)'],
+      ['function exposedBalance() view returns(uint64)'],
       provider,
     );
-    const revealedSecret = await contract.revealedSecret();
+    const revealedSecret = await contract.exposedBalance();
     const revealedSecretString =
       revealedSecret === 0n ? '???' : revealedSecret.toString();
     setDecryptedResult(revealedSecretString);
