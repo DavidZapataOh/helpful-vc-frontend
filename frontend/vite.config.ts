@@ -8,7 +8,7 @@ const workerImportMetaUrlRE =
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  assetsInclude: ['**/*.bin'],
+  assetsInclude: ['**/*.bin', '**/*.wasm'],
   plugins: [react(), nodePolyfills()],
   define: {
     'import.meta.env.MOCKED': process.env.MOCKED === 'true',
@@ -17,6 +17,9 @@ export default defineConfig({
     alias: {
       '@deployments': path.resolve(__dirname, '../hardhat/deployments'),
     },
+  },
+  optimizeDeps: {
+    exclude: ['@zama-ai/fhevmjs'],
   },
   server: {
     port: 9000,

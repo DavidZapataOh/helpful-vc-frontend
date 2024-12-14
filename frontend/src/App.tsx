@@ -18,19 +18,24 @@ function App() {
   if (!isInitialized) return null;
 
   return (
-    <>
-      <h1>Confidential ERC20 dApp</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="mb-8 text-4xl font-bold text-center">
+        Confidential ERC20 dApp
+      </h1>
       <Connect>
         {(account, provider) => (
           <Devnet account={account} provider={provider} />
         )}
       </Connect>
-      <p className="read-the-docs">
-        <a href="https://docs.zama.ai/fhevm">
+      <p className="mt-8 text-center text-gray-400">
+        <a 
+          href="https://docs.zama.ai/fhevm"
+          className="hover:text-blue-400 transition-colors duration-200"
+        >
           See the documentation for more information
         </a>
       </p>
-    </>
+    </div>
   );
 }
 
