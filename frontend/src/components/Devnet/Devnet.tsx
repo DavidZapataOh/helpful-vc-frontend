@@ -293,7 +293,7 @@ export const Devnet = ({ account, provider }: DevnetProps) => {
             disabled={decryptedSecret !== '???'}
             className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primaryHover disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Request Secret Decryption
+            Request Balance Decryption
           </button>
           {/* <dd className="text-textSecondary">
             The decrypted secret value is: {decryptedSecret}{' '}
